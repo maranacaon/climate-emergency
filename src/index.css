@@ -1,0 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+:root { font-family: 'DM Sans', 'Segoe UI', sans-serif; color: #1c2a26; background: #f8f9f4; font-synthesis: none; text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; --paper: #f8f9f4; --ink: #1c2a26; --muted: #79857d; --line: #dce2da; --green: #20584e; --orange: #df6844; --display: 'Space Grotesk', 'Arial Narrow', sans-serif; --sans: 'DM Sans', 'Segoe UI', sans-serif; --mono: 'SFMono-Regular', Consolas, monospace; }
+* { box-sizing: border-box; }
+body { min-width: 320px; min-height: 100vh; margin: 0; }
+button { font: inherit; }
+::selection { background: #d7e980; color: #173f3c; }
