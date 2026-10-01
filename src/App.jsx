@@ -6,6 +6,7 @@ import './App.css'
 function App() {
   const [activeMode, setActiveMode] = useState('response')
   const [language, setLanguage] = useState('en')
+  const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false)
 
   useEffect(() => {
     const titles = {
@@ -35,6 +36,19 @@ function App() {
     },
   }
 
+  useEffect(() => {
+    if (!isLanguageMenuOpen) return
+
+    const handlePointerDown = (event) => {
+      if (!event.target.closest('.language-switch')) {
+        setIsLanguageMenuOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handlePointerDown)
+    return () => document.removeEventListener('mousedown', handlePointerDown)
+  }, [isLanguageMenuOpen])
+
   const t = copy[language] || copy.en
 
   return (
@@ -45,21 +59,39 @@ function App() {
           <span>{t.brand}<span className="wordmark-period">.</span></span>
         </a>
 
-        <div className="language-switch">
-          <span className="language-globe" aria-hidden="true">◌</span>
-          <label className="sr-only" htmlFor="language-select">
-            {language === 'en' ? 'Select language' : 'Selecione o idioma'}
-          </label>
-          <select
-            id="language-select"
-            className="language-select"
-            value={language}
-            onChange={(event) => setLanguage(event.target.value)}
+        <div className={`language-switch ${isLanguageMenuOpen ? 'open' : ''}`}>
+          <button
+            type="button"
+            className="language-trigger"
             aria-label={language === 'en' ? 'Select language' : 'Selecione o idioma'}
+            aria-haspopup="listbox"
+            aria-expanded={isLanguageMenuOpen}
+            onClick={() => setIsLanguageMenuOpen((open) => !open)}
           >
-            <option value="en">EN</option>
-            <option value="pt">PT-BR</option>
-          </select>
+            <span className="language-globe" aria-hidden="true">◌</span>
+            <span className="language-value">{language === 'en' ? 'EN' : 'PT-BR'}</span>
+            <span className="language-caret" aria-hidden="true">▾</span>
+          </button>
+
+          {isLanguageMenuOpen && (
+            <div className="language-menu" role="listbox" aria-label={language === 'en' ? 'Select language' : 'Selecione o idioma'}>
+              {['en', 'pt'].map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  className="language-option"
+                  role="option"
+                  aria-selected={language === option}
+                  onClick={() => {
+                    setLanguage(option)
+                    setIsLanguageMenuOpen(false)
+                  }}
+                >
+                  {option === 'en' ? 'EN' : 'PT-BR'}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         <nav className="mode-tabs" aria-label={language === 'en' ? 'Simulation modes' : 'Modos de simulação'}>
