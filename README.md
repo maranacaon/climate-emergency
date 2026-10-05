@@ -26,6 +26,10 @@ npm run lint
 - `src/components/AppHeader.jsx`: cabeçalho, navegação de modos e seletor de idioma.
 - `src/components/ResponseGame.jsx`: missão de resposta à emergência.
 - `src/components/PolicySimulator.jsx`: simulador de cenários de políticas.
+- `src/hooks/useAppController.js`: estado global de idioma e modo ativo.
+- `src/hooks/useLanguageMenu.js`: comportamento do menu de idiomas.
+- `src/hooks/useResponseGame.js`: estado, decisões e reinício da missão.
+- `src/hooks/usePolicyScenario.js`: estado dos controles e cálculos do cenário.
 
 ## Sobre as projeções
 
