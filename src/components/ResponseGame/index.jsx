@@ -1,4 +1,9 @@
-import { useResponseGame } from '../hooks/useResponseGame'
+import { useResponseGame } from '../../hooks/useResponseGame'
+import DecisionPanel from './DecisionPanel'
+import HeatMap from './HeatMap'
+import MissionIntroduction from './MissionIntroduction'
+import MissionRail from './MissionRail'
+import ResourcePanel from './ResourcePanel'
 
 const roundsByLanguage = {
   en: [
@@ -173,155 +178,19 @@ const copyByLanguage = {
   },
 }
 
-function MissionRail({ rounds, roundIndex, finished, language }) {
-  const stepLabels = stepLabelsByLanguage[language] || stepLabelsByLanguage.en
-  const copy = copyByLanguage[language] || copyByLanguage.en
-
-  return (
-    <aside className="mission-rail" aria-label={language === 'en' ? 'Mission progress' : 'Progresso da missão'}>
-      <div className="rail-heading">{copy.railHeading}</div>
-      <div className="rail-progress" aria-label={`${language === 'en' ? 'Round' : 'Turno'} ${Math.min(roundIndex + 1, rounds.length)} ${language === 'en' ? 'of' : 'de'} ${rounds.length}`}>
-        {rounds.map((round, index) => (
-          <div className={`rail-step ${index < roundIndex || finished ? 'done' : ''} ${index === roundIndex && !finished ? 'current' : ''}`} key={round.time}>
-            <span className="rail-dot">{index < roundIndex || finished ? '✓' : `0${index + 1}`}</span>
-            <span className="rail-step-label">{stepLabels[index]}</span>
-          </div>
-        ))}
-      </div>
-      <div className="rail-note">
-        <span className="note-kicker">{copy.scenario}</span>
-        <p>{copy.scenarioText}</p>
-        <span className="note-temp">41°<small>C</small></span>
-        <span className="note-caption">{copy.peakForecast}</span>
-      </div>
-      <div className="rail-footer">{copy.protocol}</div>
-    </aside>
-  )
-}
-
-function MissionIntroduction({ round, roundIndex, rounds, finished, outcome, language }) {
-  const copy = copyByLanguage[language] || copyByLanguage.en
-  const isEnglish = language === 'en'
-
-  return (
-    <div className="intro-row">
-      <div>
-        <div className="eyebrow"><span className="eyebrow-line" /> {finished ? copy.missionClosed : round.time}</div>
-        <h1>{finished ? outcome : copy.introText}</h1>
-        <p className="intro-copy">{finished ? copy.finishedCopy : copy.introCopy}</p>
-      </div>
-      <div className="round-counter" aria-label={`${finished ? rounds.length : roundIndex + 1} ${isEnglish ? 'of' : 'de'} ${rounds.length} ${isEnglish ? 'decisions' : 'decisões'}`}>
-        <span>{String(finished ? rounds.length : roundIndex + 1).padStart(2, '0')}</span>
-        <i />
-        <small>{String(rounds.length).padStart(2, '0')}<br />{copy.roundSummary}</small>
-      </div>
-    </div>
-  )
-}
-
-function HeatMap({ location, finished, language }) {
-  const copy = copyByLanguage[language] || copyByLanguage.en
-
-  return (
-    <div className="scene-panel">
-      <img
-        className="scene-image"
-        src="https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=1500&q=85"
-        alt={language === 'en' ? 'Aerial view of a city under the sun' : 'Vista aérea de uma cidade sob o sol'}
-      />
-      <div className="scene-wash" />
-      <div className="scene-topline"><span>{copy.mapLabel}</span><span>{copy.live}&nbsp; <i /></span></div>
-      <div className="heat-legend"><span>{copy.intensity}</span><div><i /><i /><i /><i /><i /></div><small>{copy.low}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {copy.critical}</small></div>
-      <div className="map-marker marker-one"><span className="marker-pulse" /> <span>41°</span><small>04</small></div>
-      <div className="map-marker marker-two"><span className="marker-pulse" /> <span>38°</span><small>08</small></div>
-      <div className="scene-caption"><span className="caption-pin" />{finished ? copy.metro : location}</div>
-      <div className="scene-coordinates">23°32&apos; S&nbsp; 46°38&apos; W</div>
-    </div>
-  )
-}
-
-function ChoiceList({ choices, onChoose }) {
-  return (
-    <div className="choice-list">
-      {choices.map((choice, index) => (
-        <button className="choice-button" key={choice.title} onClick={() => onChoose(choice.impact)}>
-          <span className="choice-number">0{index + 1}</span>
-          <span className="choice-copy"><span className="choice-tag">{choice.tag}</span><strong>{choice.title}</strong><small>{choice.detail}</small></span>
-          <span className="choice-arrow" aria-hidden="true">↗</span>
-        </button>
-      ))}
-    </div>
-  )
-}
-
-function MissionDebrief({ outcome, resources, resourceInfo, onRestart, language }) {
-  const copy = copyByLanguage[language] || copyByLanguage.en
-
-  return (
-    <div className="debrief-panel">
-      <p>{outcome}</p>
-      <div className="debrief-stats">{resourceInfo.map((resource) => <span key={resource.key}><b>{resources[resource.key]}%</b>{resource.label}</span>)}</div>
-      <button className="restart-button" onClick={onRestart}><span aria-hidden="true">↻</span> {copy.resultLabel}</button>
-    </div>
-  )
-}
-
-function DecisionPanel({ round, finished, outcome, resources, resourceInfo, onChoose, onRestart, language }) {
-  const copy = copyByLanguage[language] || copyByLanguage.en
-
-  return (
-    <>
-      <div className="decision-heading">
-        <div><span className="decision-index">{finished ? copy.endSimulation : copy.currentSituation}</span><h2>{finished ? copy.resourceBalance : round.title}</h2></div>
-        {!finished && <span className="response-window">{copy.chooseResponse} <b>↘</b></span>}
-      </div>
-      {finished ? (
-        <MissionDebrief outcome={outcome} resources={resources} resourceInfo={resourceInfo} onRestart={onRestart} language={language} />
-      ) : (
-        <>
-          <p className="round-description">{round.description}</p>
-          <ChoiceList choices={round.choices} onChoose={onChoose} />
-        </>
-      )}
-    </>
-  )
-}
-
-function ResourcePanel({ resources, resourceInfo, language }) {
-  const copy = copyByLanguage[language] || copyByLanguage.en
-
-  return (
-    <aside className="resource-panel" aria-label={copy.cityIndicators}>
-      <div className="resource-header"><span>{language === 'en' ? 'CONTROL PANEL' : 'PAINEL DE CONTROLE'}</span><span className="resource-menu" aria-hidden="true">···</span></div>
-      <p className="resource-subhead">{copy.responseCapacity}</p>
-      <div className="resource-list">
-        {resourceInfo.map((resource) => (
-          <div className="resource-item" key={resource.key}>
-            <div className="resource-label"><span className={`resource-swatch ${resource.color}`} /><span>{resource.label}</span><strong>{resources[resource.key]}<small>%</small></strong></div>
-            <div className="resource-track" role="progressbar" aria-label={resource.label} aria-valuenow={resources[resource.key]} aria-valuemin="0" aria-valuemax="100"><span className={resource.color} style={{ width: `${resources[resource.key]}%` }} /></div>
-          </div>
-        ))}
-      </div>
-      <div className="panel-divider" />
-      <div className="briefing-label"><span className="briefing-icon">i</span> {copy.briefing}</div>
-      <p className="briefing-copy">{copy.briefingCopy}</p>
-      <div className="briefing-source">{copy.operations}</div>
-      <div className="resource-bottom"><span className="bottom-dot" /> {copy.connection} <span>●</span></div>
-    </aside>
-  )
-}
-
 function ResponseGame({ language = 'en' }) {
   const rounds = roundsByLanguage[language] || roundsByLanguage.en
   const resourceInfo = resourceInfoByLanguage[language] || resourceInfoByLanguage.en
+  const stepLabels = stepLabelsByLanguage[language] || stepLabelsByLanguage.en
+  const copy = copyByLanguage[language] || copyByLanguage.en
   const game = useResponseGame(rounds)
 
   return (
     <div className="game-layout">
-      <MissionRail rounds={rounds} roundIndex={game.roundIndex} finished={game.finished} language={language} />
+      <MissionRail rounds={rounds} roundIndex={game.roundIndex} finished={game.finished} language={language} copy={copy} stepLabels={stepLabels} />
       <section className="command-center" aria-live="polite">
-        <MissionIntroduction round={game.round} roundIndex={game.roundIndex} rounds={rounds} finished={game.finished} outcome={game.outcome} language={language} />
-        <HeatMap location={game.round.location} finished={game.finished} language={language} />
+        <MissionIntroduction round={game.round} roundIndex={game.roundIndex} rounds={rounds} finished={game.finished} outcome={game.outcome} language={language} copy={copy} />
+        <HeatMap location={game.round.location} finished={game.finished} language={language} copy={copy} />
         <DecisionPanel
           round={game.round}
           finished={game.finished}
@@ -330,10 +199,10 @@ function ResponseGame({ language = 'en' }) {
           resourceInfo={resourceInfo}
           onChoose={game.makeDecision}
           onRestart={game.restart}
-          language={language}
+          copy={copy}
         />
       </section>
-      <ResourcePanel resources={game.resources} resourceInfo={resourceInfo} language={language} />
+      <ResourcePanel resources={game.resources} resourceInfo={resourceInfo} language={language} copy={copy} />
     </div>
   )
 }
