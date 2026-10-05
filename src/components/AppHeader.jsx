@@ -1,22 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useLanguageMenu } from '../hooks/useLanguageMenu'
 
 function LanguageSwitcher({ language, onLanguageChange }) {
-  const [isOpen, setIsOpen] = useState(false)
-
-  useEffect(() => {
-    if (!isOpen) return undefined
-
-    const handlePointerDown = (event) => {
-      if (!event.target.closest('.language-switch')) {
-        setIsOpen(false)
-      }
-    }
-
-    document.addEventListener('mousedown', handlePointerDown)
-    return () => document.removeEventListener('mousedown', handlePointerDown)
-  }, [isOpen])
+  const { isOpen, toggle, select } = useLanguageMenu(onLanguageChange)
 
   const isEnglish = language === 'en'
 
@@ -28,7 +15,7 @@ function LanguageSwitcher({ language, onLanguageChange }) {
         aria-label={isEnglish ? 'Select language' : 'Selecione o idioma'}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
-        onClick={() => setIsOpen((open) => !open)}
+        onClick={toggle}
       >
         <span className="language-globe" aria-hidden="true">◌</span>
         <span className="language-value">{isEnglish ? 'EN' : 'PT-BR'}</span>
@@ -45,8 +32,7 @@ function LanguageSwitcher({ language, onLanguageChange }) {
               role="option"
               aria-selected={language === option}
               onClick={() => {
-                onLanguageChange(option)
-                setIsOpen(false)
+                select(option)
               }}
             >
               {option === 'en' ? 'EN' : 'PT-BR'}

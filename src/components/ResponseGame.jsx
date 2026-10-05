@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useResponseGame } from '../hooks/useResponseGame'
 
 const roundsByLanguage = {
   en: [
@@ -95,7 +95,6 @@ const roundsByLanguage = {
   ],
 }
 
-const initialResources = { health: 58, water: 62, power: 55, trust: 48 }
 const resourceInfoByLanguage = {
   en: [
     { key: 'health', label: 'Public health', color: 'coral' },
@@ -172,16 +171,6 @@ const copyByLanguage = {
     roundSummary: 'TURNOS',
     decisionCount: 'decisões',
   },
-}
-
-function getOutcome(resources) {
-  const average = Math.round(
-    Object.values(resources).reduce((total, value) => total + value, 0) /
-      Object.keys(resources).length,
-  )
-  if (average >= 66) return 'The city held together.'
-  if (average >= 42) return 'The response contained the worst impacts.'
-  return 'The heat won this round. The city needs to prepare better.'
 }
 
 function MissionRail({ rounds, roundIndex, finished, language }) {
@@ -323,51 +312,28 @@ function ResourcePanel({ resources, resourceInfo, language }) {
 }
 
 function ResponseGame({ language = 'en' }) {
-  const [roundIndex, setRoundIndex] = useState(0)
-  const [resources, setResources] = useState(initialResources)
-  const [finished, setFinished] = useState(false)
   const rounds = roundsByLanguage[language] || roundsByLanguage.en
   const resourceInfo = resourceInfoByLanguage[language] || resourceInfoByLanguage.en
-  const round = rounds[roundIndex]
-  const outcome = getOutcome(resources)
-
-  function makeDecision(impact) {
-    setResources((current) =>
-      Object.fromEntries(
-        Object.entries(current).map(([key, value]) => [
-          key,
-          Math.max(0, Math.min(100, value + impact[key])),
-        ]),
-      ),
-    )
-    if (roundIndex === rounds.length - 1) setFinished(true)
-    else setRoundIndex((index) => index + 1)
-  }
-
-  function restart() {
-    setRoundIndex(0)
-    setResources(initialResources)
-    setFinished(false)
-  }
+  const game = useResponseGame(rounds)
 
   return (
     <div className="game-layout">
-      <MissionRail rounds={rounds} roundIndex={roundIndex} finished={finished} language={language} />
+      <MissionRail rounds={rounds} roundIndex={game.roundIndex} finished={game.finished} language={language} />
       <section className="command-center" aria-live="polite">
-        <MissionIntroduction round={round} roundIndex={roundIndex} rounds={rounds} finished={finished} outcome={outcome} language={language} />
-        <HeatMap location={round.location} finished={finished} language={language} />
+        <MissionIntroduction round={game.round} roundIndex={game.roundIndex} rounds={rounds} finished={game.finished} outcome={game.outcome} language={language} />
+        <HeatMap location={game.round.location} finished={game.finished} language={language} />
         <DecisionPanel
-          round={round}
-          finished={finished}
-          outcome={outcome}
-          resources={resources}
+          round={game.round}
+          finished={game.finished}
+          outcome={game.outcome}
+          resources={game.resources}
           resourceInfo={resourceInfo}
-          onChoose={makeDecision}
-          onRestart={restart}
+          onChoose={game.makeDecision}
+          onRestart={game.restart}
           language={language}
         />
       </section>
-      <ResourcePanel resources={resources} resourceInfo={resourceInfo} language={language} />
+      <ResourcePanel resources={game.resources} resourceInfo={resourceInfo} language={language} />
     </div>
   )
 }
