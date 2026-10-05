@@ -23,9 +23,9 @@ npm run lint
 - `app/layout.jsx`: layout raiz e metadados da aplicação.
 - `app/page.jsx`: página principal.
 - `src/App.jsx`: composição e estado dos modos da simulação.
-- `src/components/AppHeader.jsx`: cabeçalho, navegação de modos e seletor de idioma.
-- `src/components/ResponseGame.jsx`: missão de resposta à emergência.
-- `src/components/PolicySimulator.jsx`: simulador de cenários de políticas.
+- `src/components/AppHeader/`: cabeçalho, navegação de modos e seletor de idioma.
+- `src/components/ResponseGame/`: missão de resposta à emergência e seus componentes visuais.
+- `src/components/PolicySimulator/`: simulador de cenários, gráfico, controles e resumo.
 - `src/hooks/useAppController.js`: estado global de idioma e modo ativo.
 - `src/hooks/useLanguageMenu.js`: comportamento do menu de idiomas.
 - `src/hooks/useResponseGame.js`: estado, decisões e reinício da missão.
